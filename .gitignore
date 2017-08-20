@@ -1,0 +1,12 @@
+/.vs
+/Binaries
+/DerivedDataCache
+/Intermediate
+/Saved
+/ipch
+*.sln
+*.sdf
+*.suo
+*.VC.db
+*.VC.opendb
+*.blend*
