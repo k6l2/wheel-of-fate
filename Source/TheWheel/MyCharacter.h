@@ -14,4 +14,9 @@ public:
 private:
     void onClicked();
     void onReleased();
+private:
+    float wheelGrabDistance;
+    UPhysicsHandleComponent* grabbedPhysicsHandle;
+    UPrimitiveComponent* grabbedComponent;
+    AActor* grabbedActor;
 };

@@ -12,6 +12,16 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+    if (grabbedPhysicsHandle)
+    {
+        const APlayerController* const playerController = Cast<APlayerController>(GetController());
+        check(playerController);
+        FVector mouseWorldLocation;
+        FVector mouseWorldDirection;
+        playerController->DeprojectMousePositionToWorld(mouseWorldLocation, mouseWorldDirection);
+        grabbedPhysicsHandle->SetTargetLocation(
+            mouseWorldLocation + mouseWorldDirection*wheelGrabDistance);
+    }
 }
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -21,7 +31,17 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 void AMyCharacter::onClicked()
 {
+    if (grabbedPhysicsHandle)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("We're already holding something!"));
+        }
+        return;
+    }
     const APlayerController* const playerController = Cast<APlayerController>(GetController());
+    check(playerController);
     // Get the coordinates of the mouse from our controller  //
     float mousePositionX;
     float mousePositionY;
@@ -32,28 +52,93 @@ void AMyCharacter::onClicked()
     const bool bTraceComplex = false;
     const bool hitSomething = playerController->GetHitResultAtScreenPosition(
         mousePosition, ECC_Visibility, bTraceComplex, hitResult);
-    if (hitSomething)
-    {
-        //APawn* clickedPawn = Cast<APawn>(hitResult.GetActor());
-        if (hitResult.GetActor())
-        {
-            if (GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
-                    TEXT("Actor clicked! name=") + hitResult.GetActor()->GetName());
-            }
-        }
-        ///TODO: create a physics handle if we're clicking on a physics-enabled actor
-    }
-    else
+    if (!hitSomething)
     {
         if (GEngine)
         {
             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
                 TEXT("Clicked NOTHING!"));
         }
+        return;
+    }
+    //APawn* clickedPawn = Cast<APawn>(hitResult.GetActor());
+    auto const hitActor = hitResult.GetActor();
+    if (!hitActor)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("HitActor doesn't exist?!"));
+        }
+        return;
+    }
+    auto meshComp = hitActor->GetComponentByClass(
+        UStaticMeshComponent::StaticClass());
+    if (!meshComp)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("HitActor contains no mesh!"));
+        }
+        return;
+    }
+    auto meshCompCasted = Cast<UStaticMeshComponent>(meshComp);
+    if (!meshCompCasted || !meshCompCasted->IsSimulatingPhysics())
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("hit actor's mesh isn't simulating physics (or doesn't exist)!"));
+        }
+        return;
+    }
+    auto comp = hitActor->GetComponentByClass(
+        UPhysicsHandleComponent::StaticClass());
+    if (comp)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("HitActor already contains a physics handle!"));
+        }
+        return;
+    }
+    wheelGrabDistance = hitResult.Distance;
+    grabbedPhysicsHandle = NewObject<UPhysicsHandleComponent>(hitActor, TEXT("physicsHandle"));
+    if (grabbedPhysicsHandle)
+    {
+        grabbedComponent = hitResult.Component.Get();
+        check(grabbedComponent);
+        grabbedPhysicsHandle->RegisterComponent();
+        grabbedPhysicsHandle->SetTargetLocation(hitResult.Location);
+        grabbedPhysicsHandle->GrabComponentAtLocation(
+            grabbedComponent,
+            hitResult.BoneName,
+            hitResult.Location);
+    }
+    grabbedActor = hitActor;
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
+            TEXT("Actor grabbed! name=") + grabbedActor->GetName());
     }
 }
 void AMyCharacter::onReleased()
 {
+    if (!grabbedActor)
+    {
+        return;
+    }
+    grabbedPhysicsHandle->ReleaseComponent();
+    grabbedComponent->WakeRigidBody();
+    grabbedActor->K2_DestroyComponent(grabbedPhysicsHandle);
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
+            TEXT("Actor released! name=") + grabbedActor->GetName());
+    }
+    grabbedActor = nullptr;
+    grabbedComponent = nullptr;
+    grabbedPhysicsHandle = nullptr;
 }
