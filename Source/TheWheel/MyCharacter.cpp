@@ -22,6 +22,22 @@ void AMyCharacter::Tick( float DeltaTime )
         grabbedPhysicsHandle->SetTargetLocation(
             mouseWorldLocation + mouseWorldDirection*wheelGrabDistance);
     }
+    else if (grabbedComponent)
+    {
+        const FVector angularVelocity = grabbedComponent->GetPhysicsAngularVelocity();
+        const float angularSpeed = angularVelocity.Size();
+        static const float STOPPING_SPIN_SPEED = 1;
+        if (angularSpeed <= STOPPING_SPIN_SPEED)
+        {
+            const FRotator rotation = grabbedComponent->GetComponentRotation();
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue,
+                    TEXT("Spin complete! finalAngle=") + rotation.ToString());
+            }
+            grabbedComponent = nullptr;
+        }
+    }
 }
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -37,6 +53,15 @@ void AMyCharacter::onClicked()
         {
             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
                 TEXT("We're already holding something!"));
+        }
+        return;
+    }
+    if (grabbedComponent)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue,
+                TEXT("A spin is already in progress..."));
         }
         return;
     }
@@ -133,12 +158,22 @@ void AMyCharacter::onReleased()
     grabbedPhysicsHandle->ReleaseComponent();
     grabbedComponent->WakeRigidBody();
     grabbedActor->K2_DestroyComponent(grabbedPhysicsHandle);
+    const FVector angularVelocity = grabbedComponent->GetPhysicsAngularVelocity();
+    const float angularSpeed = angularVelocity.Size();
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
-            TEXT("Actor released! name=") + grabbedActor->GetName());
+            TEXT("Actor released! name=") + grabbedActor->GetName() + 
+            TEXT(" angularSpeed=") + FString::SanitizeFloat(angularSpeed) +
+            TEXT(" angularVelocity=") + angularVelocity.ToString());
     }
+    static const float MIN_SPIN_SPEED = 1000;
     grabbedActor = nullptr;
-    grabbedComponent = nullptr;
     grabbedPhysicsHandle = nullptr;
+    if (angularSpeed >= MIN_SPIN_SPEED)
+    {
+        // preserve grabbedComponent! //
+        return;
+    }
+    grabbedComponent = nullptr;
 }
