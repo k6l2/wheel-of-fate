@@ -10,3 +10,4 @@
 *.VC.db
 *.VC.opendb
 *.blend*
+!*.blend
