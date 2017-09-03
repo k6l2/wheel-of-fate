@@ -12,6 +12,8 @@ class THEWHEEL_API UWidgetMainMenu : public UUserWidget
 protected:
     UFUNCTION(BlueprintCallable, Category = Callbacks)
     void onAddOptionClicked();
+    UFUNCTION(BlueprintCallable, Category = Callbacks)
+    void onSpinTheWheelClicked();
 private:
     UPROPERTY(EditDefaultsOnly, Category = UI)
     TSubclassOf<UUserWidget> widgetTemplateOptions;

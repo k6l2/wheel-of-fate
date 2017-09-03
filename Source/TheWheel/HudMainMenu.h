@@ -13,6 +13,7 @@ class THEWHEEL_API AHudMainMenu : public AHUD
 public:
     AHudMainMenu();
     virtual void PostInitializeComponents() override;
+    bool widgetInViewport() const;
 private:
     UPROPERTY(EditDefaultsOnly, Category = UI)
     TSubclassOf<UUserWidget> widgetTemplate;

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "TheWheel.h"
 #include "MyCharacter.h"
+#include "MyPlayerController.h"
 AMyCharacter::AMyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,8 +46,28 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     PlayerInputComponent->BindAction("clicked", IE_Pressed, this, &AMyCharacter::onClicked);
     PlayerInputComponent->BindAction("clicked", IE_Released, this, &AMyCharacter::onReleased);
 }
+#include "HudMainMenu.h"
 void AMyCharacter::onClicked()
 {
+    auto controller = GetController();
+    if (!controller)
+    {
+        return;
+    }
+    auto pController = Cast<AMyPlayerController>(controller);
+    if (!pController)
+    {
+        return;
+    }
+    auto hud = Cast<AHudMainMenu>(pController->GetHUD());
+    if (!hud)
+    {
+        return;
+    }
+    if (hud->widgetInViewport())
+    {
+        return;
+    }
     if (grabbedPhysicsHandle)
     {
         if (GEngine)

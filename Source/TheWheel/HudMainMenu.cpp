@@ -17,5 +17,10 @@ void AHudMainMenu::PostInitializeComponents()
         return;
     }
     widgetInstance->AddToViewport();
+    //widgetInstance->SetKeyboardFocus();
     AActor::PostInitializeComponents();
+}
+bool AHudMainMenu::widgetInViewport() const
+{
+    return widgetInstance && widgetInstance->IsInViewport();
 }

@@ -18,10 +18,30 @@ void UWidgetMainMenu::onAddOptionClicked()
     check(widgetEditTextOptionName);
     UEditableTextBox* editTextOptionName = Cast<UEditableTextBox>(widgetEditTextOptionName);
     check(editTextOptionName);
+    if (editTextOptionName->GetText().IsEmpty())
+    {
+        return;
+    }
     UScrollBox* scrollBoxOptions = Cast<UScrollBox>(widgetScrollBoxOptions);
     check(scrollBoxOptions);
     UWidgetOption* widgetNewOption = CreateWidget<UWidgetOption>(world, widgetTemplateOptions);
     check(widgetNewOption);
     widgetNewOption->setOptionText(editTextOptionName->GetText());
+    editTextOptionName->SetText(FText::FromString(""));
     scrollBoxOptions->AddChild(widgetNewOption);
+}
+void UWidgetMainMenu::onSpinTheWheelClicked()
+{
+    UWidget* widgetScrollBoxOptions = GetWidgetFromName("scrollBoxOptions");
+    check(widgetScrollBoxOptions);
+    UScrollBox* scrollBoxOptions = Cast<UScrollBox>(widgetScrollBoxOptions);
+    check(scrollBoxOptions);
+    if (scrollBoxOptions->GetChildrenCount() < 1)
+    {
+        // we require >= 1 option for the wheel to actually work! //
+        return;
+    }
+    /// TODO: store the list of options inside scrollBoxOptions somewhere globally probably
+    /// TODO: generate the wheel's dynamic texture for our list of options
+    RemoveFromViewport();
 }
