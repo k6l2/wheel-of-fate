@@ -6,4 +6,8 @@ UCLASS()
 class THEWHEEL_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+protected:
+    virtual void SetupInputComponent() override;
+private:
+    void onConfirm();
 };

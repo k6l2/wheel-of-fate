@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "TheWheel.h"
 #include "HudMainMenu.h"
+#include "WidgetMainMenu.h"
 AHudMainMenu::AHudMainMenu()
 {
 }
@@ -17,10 +18,21 @@ void AHudMainMenu::PostInitializeComponents()
         return;
     }
     widgetInstance->AddToViewport();
-    //widgetInstance->SetKeyboardFocus();
+    //FInputModeUIOnly inputMode;
+    //world->GetFirstPlayerController()->SetInputMode(inputMode);
+    widgetInstance->SetKeyboardFocus();
     AActor::PostInitializeComponents();
 }
 bool AHudMainMenu::widgetInViewport() const
 {
     return widgetInstance && widgetInstance->IsInViewport();
 }
+//void AHudMainMenu::onControllerConfirm()
+//{
+//    auto widgetMainMenu = Cast<UWidgetMainMenu>(widgetInstance);
+//    if (!widgetMainMenu)
+//    {
+//        return;
+//    }
+//    widgetMainMenu->onHudConfirm();
+//}

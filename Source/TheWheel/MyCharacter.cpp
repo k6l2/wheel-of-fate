@@ -49,23 +49,48 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 #include "HudMainMenu.h"
 void AMyCharacter::onClicked()
 {
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
+            TEXT("AMyCharacter::onClicked()..."));
+    }
     auto controller = GetController();
     if (!controller)
     {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("Controller not found!"));
+        }
         return;
     }
     auto pController = Cast<AMyPlayerController>(controller);
     if (!pController)
     {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("pController not found!"));
+        }
         return;
     }
     auto hud = Cast<AHudMainMenu>(pController->GetHUD());
     if (!hud)
     {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("HUD not found!"));
+        }
         return;
     }
     if (hud->widgetInViewport())
     {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
+                TEXT("HUD still in viewport!!!"));
+        }
         return;
     }
     if (grabbedPhysicsHandle)

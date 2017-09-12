@@ -14,6 +14,7 @@ public:
     AHudMainMenu();
     virtual void PostInitializeComponents() override;
     bool widgetInViewport() const;
+    //void onControllerConfirm();
 private:
     UPROPERTY(EditDefaultsOnly, Category = UI)
     TSubclassOf<UUserWidget> widgetTemplate;
