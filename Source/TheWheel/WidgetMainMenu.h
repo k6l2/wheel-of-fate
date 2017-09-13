@@ -25,4 +25,8 @@ protected:
 private:
     UPROPERTY(EditDefaultsOnly, Category = UI)
     TSubclassOf<UUserWidget> widgetTemplateOptions;
+    UPROPERTY()
+    UMaterialInstanceDynamic* wheelDynamicFrontMaterial;
+    UPROPERTY()
+    UTexture2D* wheelChoicesTexture;
 };

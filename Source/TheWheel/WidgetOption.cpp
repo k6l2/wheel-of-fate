@@ -24,6 +24,14 @@ void UWidgetOption::percentage(float newPercent)
     sliderProbability->SetValue(newPercent);
     oldPercentage = newPercent;
 }
+FText UWidgetOption::optionText() const
+{
+    UWidget* widgetTxtOption = GetWidgetFromName("txtOption");
+    check(widgetTxtOption);
+    UTextBlock* txtOption = Cast<UTextBlock>(widgetTxtOption);
+    check(txtOption);
+    return txtOption->GetText();
+}
 void UWidgetOption::setOptionText(const FText& inText)
 {
     UWidget* widgetTxtOption = GetWidgetFromName("txtOption");

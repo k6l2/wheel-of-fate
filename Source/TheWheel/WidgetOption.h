@@ -13,6 +13,7 @@ public:
     UWidgetOption(const FObjectInitializer & ObjectInitializer);
     float percentage() const;
     void percentage(float newPercent);
+    FText optionText() const;
     void setOptionText(const FText& inText);
 protected:
     UFUNCTION(BlueprintCallable, Category = Callbacks)
