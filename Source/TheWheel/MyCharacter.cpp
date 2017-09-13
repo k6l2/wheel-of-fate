@@ -2,6 +2,7 @@
 #include "TheWheel.h"
 #include "MyCharacter.h"
 #include "MyPlayerController.h"
+#include "HudMainMenu.h"
 AMyCharacter::AMyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -31,10 +32,33 @@ void AMyCharacter::Tick( float DeltaTime )
         if (angularSpeed <= STOPPING_SPIN_SPEED)
         {
             const FRotator rotation = grabbedComponent->GetComponentRotation();
+            const float finalRoll = rotation.Roll < 0 ? 360 + rotation.Roll : rotation.Roll;
+            const float finalPercent = finalRoll / 360;
             if (GEngine)
             {
                 GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue,
-                    TEXT("Spin complete! finalAngle=") + rotation.ToString());
+                    TEXT("Spin complete! finalAngle=") + rotation.ToString() +
+                    TEXT(" finalRoll=") + FString::SanitizeFloat(finalRoll) +
+                    TEXT(" finalPercent=") + FString::SanitizeFloat(finalPercent));
+            }
+            auto pController = Cast<AMyPlayerController>(Controller);
+            check(pController);
+            auto hud = Cast<AHudMainMenu>(pController->GetHUD());
+            for (int32 c = 0; c < hud->wheelChoices.Num(); c++)
+            {
+                auto& choice = hud->wheelChoices[c];
+                UE_LOG(LogTemp, Warning, TEXT("choice name=%s percentStart=%f percent=%f"),
+                    *choice.name, choice.percentStart, choice.percent);
+                if (finalPercent >= choice.percentStart &&
+                    finalPercent < choice.percentStart + choice.percent)
+                {
+                    if (GEngine)
+                    {
+                        GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Green,
+                            TEXT("*** WINNER = ") + choice.name + TEXT(" ***"));
+                    }
+                    break;
+                }
             }
             grabbedComponent = nullptr;
         }

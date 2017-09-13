@@ -74,7 +74,7 @@ void UWidgetMainMenu::onSpinTheWheelClicked()
     check(hud);
     // You need >= 3 choice colors to have distinct edges for each pie slice...
     static const TArray<FColor> CHOICE_COLORS = {
-        {255,0,0},
+        {90,0,213},
         {0,255,0},
         {0,0,255}
     };
@@ -100,6 +100,8 @@ void UWidgetMainMenu::onSpinTheWheelClicked()
         }
         choice.color = CHOICE_COLORS[colorIndex];
         hud->wheelChoices.Add(choice);
+        UE_LOG(LogTemp, Warning, TEXT("choice name=%s percentStart=%f percent=%f"),
+            *choice.name, choice.percentStart, choice.percent);
     }
     // generate the wheel's dynamic texture for our list of options //
     // https://wiki.unrealengine.com/Dynamic_Textures
@@ -123,7 +125,7 @@ void UWidgetMainMenu::onSpinTheWheelClicked()
         for (int32 i = 0; i < mipTotalPixels; i++)
         {
             float pixelPercent = float(i) / mipTotalPixels;
-            auto& currChoice = hud->wheelChoices[wheelChoiceIndex];
+            auto currChoice = hud->wheelChoices[wheelChoiceIndex];
             if (pixelPercent > currChoice.percentStart + currChoice.percent)
             {
                 currChoice = hud->wheelChoices[++wheelChoiceIndex];
