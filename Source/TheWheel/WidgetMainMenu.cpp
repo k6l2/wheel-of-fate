@@ -153,7 +153,9 @@ void UWidgetMainMenu::onSpinTheWheelClicked()
                 wheelStaticMeshComponent->CreateAndSetMaterialInstanceDynamicFromMaterial(
                     0, wheelStaticMeshComponent->GetMaterial(0));
             UTexture* prevTexChoices;
-            wheelDynamicFrontMaterial->GetTextureParameterValue("texChoices", prevTexChoices);
+			FMaterialParameterInfo matParamInfo;
+			matParamInfo.Name = "texChoices";
+            wheelDynamicFrontMaterial->GetTextureParameterValue(matParamInfo, prevTexChoices);
             if (GEngine)
             {
                 GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,

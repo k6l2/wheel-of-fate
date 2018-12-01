@@ -4,7 +4,7 @@ using UnrealBuildTool;
 
 public class TheWheel : ModuleRules
 {
-	public TheWheel(TargetInfo Target)
+	public TheWheel(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
