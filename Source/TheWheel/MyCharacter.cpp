@@ -26,7 +26,8 @@ void AMyCharacter::Tick( float DeltaTime )
     }
     else if (grabbedComponent)
     {
-        const FVector angularVelocity = grabbedComponent->GetPhysicsAngularVelocity();
+        const FVector angularVelocity = 
+			grabbedComponent->GetPhysicsAngularVelocityInDegrees();
         const float angularSpeed = angularVelocity.Size();
         static const float STOPPING_SPIN_SPEED = 1;
         if (angularSpeed <= STOPPING_SPIN_SPEED)
@@ -226,9 +227,11 @@ void AMyCharacter::onReleased()
         return;
     }
     grabbedPhysicsHandle->ReleaseComponent();
+    grabbedPhysicsHandle->DestroyComponent();
     grabbedComponent->WakeRigidBody();
-    grabbedActor->K2_DestroyComponent(grabbedPhysicsHandle);
-    const FVector angularVelocity = grabbedComponent->GetPhysicsAngularVelocity();
+    //grabbedActor->K2_DestroyComponent(grabbedPhysicsHandle);
+    const FVector angularVelocity = 
+		grabbedComponent->GetPhysicsAngularVelocityInDegrees();
     const float angularSpeed = angularVelocity.Size();
     if (GEngine)
     {
